@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--=============== BOXICONS ===============-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <title>Nom Nom Kitchen</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/images/logo.png" sizes="32x32" />
+</head>
+
+<body>
+    <!--=============== HEADER START ===============-->
+    <header class="header" id="header">
+        <nav class="nav container">
+            <a href="home.html" class="nav__logo">Nom Nom Kitchen</a>
+
+            <div class="nav__menu" id="nav-menu">
+                <ul class="nav__list">
+                    <li class="nav__item">
+                        <a href="home.html" class="nav__link">
+                            <i class='bx bx-home-alt nav__icon'></i>
+                            <span class="nav__name">Home</span>
+                        </a>
+                    </li>
+
+                    <li class="nav__item">
+                        <a href="categories.html" class="nav__link active-link">
+                            <i class='bx bx-grid-alt nav__icon'></i>
+                            <span class="nav__name">Recipes</span>
+                        </a>
+                    </li>
+
+                    <li class="nav__item">
+                        <a href="popular.html" class="nav__link">
+                            <i class='bx bxs-hot nav__icon'></i>
+                            <span class="nav__name">Popular</span>
+                        </a>
+                    </li>
+
+                    <li class="nav__item">
+                        <a href="favorite.html" class="nav__link">
+                            <i class='bx bxs-heart nav__icon'></i>
+                            <span class="nav__name">Favorite</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <img src="images/logo.png" alt="logo" class="nav__img">
+        </nav>
+    </header>
+    <!--=============== HEADER END ===============-->
+
+
+
+
+    <!--================ CONTENT START ==============-->
+
+    <div class="content container">
+        <div class="meal-wrapper">
+            <div id="categories">
+                <h2 class="title">Categories</h2>
+                <div class="category-list" id="category-list"></div>
+            </div>
+        </div>
+    </div>
+    <!--================ CONTENT ENDS ==============-->
+
+    <!--=============== FOOTER ===============-->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2023 Nom Nom Kitchen. All rights reserved by Amiglow.</p>
+        </div>
+    </footer>
+
+    <!--=============== MAIN JS ===============-->
+
+    <script src="js/main.js"></script>
+</body>
+
+</html>

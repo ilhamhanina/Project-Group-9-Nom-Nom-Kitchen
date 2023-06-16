@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--=============== BOXICONS ===============-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/boxicons@3.4.0/boxicons.min.js" crossorigin="anonymous" defer></script>
+
+    <title>Nom Nom Kitchen</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/images/logo.png" sizes="32x32" />
+</head>
+
+<body>
+    <!--=============== HEADER START ===============-->
+    <header class="header" id="header">
+        <nav class="nav container">
+            <a href="home.html" class="nav__logo">Nom Nom Kitchen</a>
+
+            <div class="nav__menu" id="nav-menu">
+                <ul class="nav__list">
+                    <li class="nav__item">
+                        <a href="index.html" class="nav__link">
+                            <i class='bx bx-home-alt nav__icon'></i>
+                            <span class="nav__name">Home</span>
+                        </a>
+                    </li>
+
+                    <li class="nav__item">
+                        <a href="categories.html" class="nav__link">
+                            <i class='bx bx-grid-alt nav__icon'></i>
+                            <span class="nav__name">Recipes</span>
+                        </a>
+                    </li>
+
+                    <li class="nav__item">
+                        <a href="popular.html" class="nav__link active-link">
+                            <i class='bx bxs-hot nav__icon'></i>
+                            <span class="nav__name">Popular</span>
+                        </a>
+                    </li>
+
+                    <li class="nav__item">
+                        <a href="favorite.html" class="nav__link">
+                            <i class='bx bxs-heart nav__icon'></i>
+                            <span class="nav__name">Favorite</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <img src="images/logo.png" alt="logo" class="nav__img">
+        </nav>
+    </header>
+    <!--=============== HEADER END ===============-->
+
+
+
+    <!--================ CONTENT START ==============-->
+
+    <div class="content container">
+        <div class="meal-wrapper">
+            <h2 class="title">Popular</h2>
+            <div id="meal-list"></div>
+        </div>
+    </div>
+    <!--================ CONTENT ENDS ==============-->
+
+
+    <!-- Meal details popup -->
+    <div class="meal-details" id="meal-details-popup">
+        <div class="meal-details__content">
+            <span class="meal-details__close" id="meal-details-close">&times;</span>
+            <img src="" alt="" class="meal-details__image" id="meal-details-image">
+            <h3 class="meal-details__name" id="meal-details-name"></h3>
+            <div class="meal-details__instructions" id="meal-details-instructions"></div>
+        </div>
+    </div>
+
+    <!--=============== FOOTER ===============-->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2023 Nom Nom Kitchen. All rights reserved by Amiglow.</p>
+        </div>
+    </footer>
+
+    <!--=============== MAIN JS ===============-->
+    <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-database.js"></script>
+
+    <script src="js/main.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Function to create a meal card
+            function createMealCard(meal) {
+                const mealCard = document.createElement("div");
+                mealCard.className = "meal-card";
+
+                const mealImage = document.createElement("img");
+                mealImage.src = meal.strMealThumb;
+                mealImage.alt = meal.strMeal;
+
+                const mealName = document.createElement("h4");
+                mealName.textContent = meal.strMeal;
+
+                // Add a click event listener to show the meal details popup
+                mealCard.addEventListener("click", function () {
+                    showMealDetails(meal);
+                });
+
+                mealCard.appendChild(mealImage);
+                mealCard.appendChild(mealName);
+
+                return mealCard;
+            }
+
+            // Function to display the clicked meal
+            function displayMeal(clickedLink) {
+                const clickedLinkElement = document.getElementById("clicked-link");
+                clickedLinkElement.textContent = clickedLink;
+            }
+
+            // Function to show meal details popup
+            function showMealDetails(meal) {
+                const mealDetailsPopup = document.getElementById("meal-details-popup");
+                const mealDetailsImage = document.getElementById("meal-details-image");
+                const mealDetailsName = document.getElementById("meal-details-name");
+                const mealDetailsInstructions = document.getElementById("meal-details-instructions");
+
+                // Set meal details
+                mealDetailsImage.src = meal.strMealThumb;
+                mealDetailsName.textContent = meal.strMeal;
+
+                // Fetch additional details using meal ID
+                const xhr = new XMLHttpRequest();
+                const url = "https://www.themealdb.com/api/json/v1/1/lookup.php?i=" + meal.idMeal;
+                xhr.open("GET", url, true);
+
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        const data = JSON.parse(xhr.responseText);
+                        const mealDetails = data.meals[0];
+
+                        // Split instructions into an array of steps
+                        const instructions = mealDetails.strInstructions.split("\r\n");
+
+                        // Create an ordered list of instructions
+                        let instructionsList = "<ol>";
+                        instructions.forEach((instruction) => {
+                            if (instruction.trim() !== "") {
+                                instructionsList += `<li>${instruction}</li>`;
+                            }
+                        });
+                        instructionsList += "</ol>";
+
+                        // Set instructions
+                        mealDetailsInstructions.innerHTML =
+                            `<h4>Instructions:</h4>${instructionsList} 
+                    <h4>Ingredients:</h4>
+                    <ul>${getIngredientsList(mealDetails)}</ul>`;
+
+                        // Show the meal details popup
+                        mealDetailsPopup.style.display = "flex";
+                        // Close meal details popup when clicking outside the popup
+                        document.addEventListener("click", function (event) {
+                            if (
+                                !mealDetailsPopup.contains(event.target) &&
+                                event.target !== mealDetailsPopup
+                            ) {
+                                const closePopup = function () {
+                                    closeMealDetails();
+                                    document.removeEventListener("click", closePopup);
+                                };
+                                document.addEventListener("click", closePopup);
+                                // Prevent click event propagation when clicking on the meal details popup
+                                mealDetailsPopup.addEventListener("click", function (event) {
+                                    event.stopPropagation();
+                                });
+                            }
+                        });
+                    } else {
+                        console.log("Error fetching meal details. Status:", xhr.status);
+                    }
+                };
+
+                xhr.onerror = function () {
+                    console.log("Error fetching meal details. Please try again later.");
+                };
+
+                xhr.send();
+            }
+
+            // Function to get the list of ingredients
+            function getIngredientsList(mealDetails) {
+                let ingredientsList = "";
+                for (let i = 1; i <= 20; i++) {
+                    const ingredient = mealDetails["strIngredient" + i];
+                    const measure = mealDetails["strMeasure" + i];
+
+                    if (ingredient && measure) {
+                        ingredientsList += `<li>${measure} ${ingredient}</li>`;
+                    }
+                }
+                return ingredientsList;
+            }
+
+            // Function to close the meal details popup
+            function closeMealDetails() {
+                const mealDetailsPopup = document.getElementById("meal-details-popup");
+                mealDetailsPopup.style.display = "none";
+                document.removeEventListener("click", closeMealDetails);
+            }
+
+            // Close meal details popup when close button is clicked
+            const mealDetailsCloseBtn = document.getElementById("meal-details-close");
+            mealDetailsCloseBtn.addEventListener("click", closeMealDetails);
+
+            // Fetch meal data from the API
+            const mealNames = [
+                "Cream Cheese Tart",
+                "Chocolate Gateau",
+                "Spaghetti Bolognese",
+                "Salmon Prawn Risotto",
+                "Spanish Tortilla"
+            ];
+
+            mealNames.forEach((mealName) => {
+                const xhr = new XMLHttpRequest();
+                const url = "https://www.themealdb.com/api/json/v1/1/search.php?s=" + encodeURIComponent(mealName);
+                xhr.open("GET", url, true);
+
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        const data = JSON.parse(xhr.responseText);
+                        const meal = data.meals[0];
+
+                        if (meal) {
+                            const mealCard = createMealCard(meal);
+                            const mealList = document.getElementById("meal-list");
+                            mealList.appendChild(mealCard);
+                        }
+                    } else {
+                        console.log("Error fetching meal data for", mealName, "Status:", xhr.status);
+                    }
+                };
+
+                xhr.onerror = function () {
+                    console.log("Error fetching meal data for", mealName, "Please try again later.");
+                };
+
+                xhr.send();
+            });
+        });
+
+
+
+    </script>
+</body>
+
+</html>
